@@ -44,7 +44,7 @@ app.use(cors());
 
 // Establish DB connection
 //Für eine Offline Database statt <DB_URI_ONLINE> einfach <DB_URI + DB> einsetzen
-mongoose.connect(DB_URI_ONLINE, {
+mongoose.connect("mongodb+srv://Manuel:ToDoListNextJs@cluster0.bvwmd.mongodb.net/NextJsToDOList?retryWrites=true&w=majority", {
   useUnifiedTopology: true,
   useNewUrlParser: true,
   useCreateIndex: true,
