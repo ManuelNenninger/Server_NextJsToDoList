@@ -31,7 +31,7 @@ app.options('*', cors());
 //For Development use localhost of server
 //For deploy use https://nextjs-to-do-list.vercel.app
 var corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: 'https://nextjs-to-do-list.vercel.app',
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 //Alle Routes sollen bedient werden. Nicht nur eine einzige
@@ -55,18 +55,6 @@ const db = mongoose.connection;
 db.once('open', () => console.log(`Connected to ${DB} database`));
 
 
-const ListSchema = new mongoose.Schema({
-  Titel: String,
-  Content: String,
-});
-
-const ListModel = mongoose.model('ListCollection', ListSchema);
-// const probe = new ListModel({
-//   Titel: "Test Two",
-//   Content: "Content Two",
-// });
-// probe.save();
-
 const NoteModel = new mongoose.Schema({
   Note: String,
 });
@@ -78,80 +66,21 @@ const UserList = new mongoose.Schema({
 
 const UserModel = mongoose.model('UserListCollection', UserList);
 
-//Get all ListItems
-app.get("/api/list", function(req, res) {
-  ListModel.find({}, (err, docs) => {
-    if (!err) {
-      res.json(docs)
-    } else {
-      res.status(400).json({
-        "error": err
-      });
-    }
-  });
-});
+
 // app.options('/api/list/add', function (req, res) {
 //   res.setHeader("Access-Control-Allow-Origin", "*");
 //   res.setHeader('Access-Control-Allow-Methods', '*');
 //   res.setHeader("Access-Control-Allow-Headers", "*");
 //   res.end();
 // });
-//Create One new List Item and send back the aktuelle List
-app.post("/api/list/add", function(req, res) {
-  console.log("the add request was made");
-  console.log(req.body);
-  const probe = new ListModel({
-    Titel: req.body.Titel,
-    Content: "sended Request",
-  });
-  probe.save(function(err) {
-    if (!err) {
-      ListModel.find({}, (error, docs) => {
-        if (!error) {
-          res.json(docs)
-        } else {
-          res.status(400).json({
-            "error": error
-          });
-        }
-      });
-    } else {
-      res.status(400).json({
-        "error": err
-      });
-    }
-  });
-})
-//Delete Request and send back the aktuelle List
-app.post("/api/list/delete", function(req, res) {
-  console.log("the delete request was made");
-  console.log(req.body);
-  const id = req.body.id;
 
-  ListModel.findByIdAndRemove(id, function(err) {
-    if (!err) {
-      ListModel.find({}, (error, docs) => {
-        if (!error) {
-          res.json(docs)
-        } else {
-          res.status(400).json({
-            "error": error
-          });
-        }
-      });
-    } else {
-      res.status(400).json({
-        "error": err
-      });
-    }
-  });
-})
+
 //Here is the initial Request made from the Client.
 //Es wird entschieden, ob bereits ein account da ist oder nicht.
 //Falls ja, wird einfach die Collection nach einem Document mit der passenden UserId durchsucht und an den Client übersendet.
 //Falls nicht, wird in der Collection ein Document erstellt und dann an den Client zurück gesendet.
 //Gesendet wird das Array mit UserId und dem Array, in welchem die Notes gespeichert sind.
-app.post("/api/list/test", function(req, res) {
+app.post("/api/list", function(req, res) {
   console.log("the initial request after LogIn was made");
   console.log(req.body.id);
   const UserIdFromSession = req.body.id;
@@ -162,8 +91,7 @@ app.post("/api/list/test", function(req, res) {
     if (!error) {
       //If User already has an account
       if (docs.length != 0) {
-        console.log("User already has data");
-        console.log("the length of the Userarray is: " + docs.length);
+        console.log("User already has data. Send current Document!");
         UserModel.find({
           UserId: UserIdFromSession
         }, (error, docs) => {
@@ -212,7 +140,7 @@ app.post("/api/list/test", function(req, res) {
 });
 
 //Hier wird eine neue Note in das subdocument hinzugefügt.
-app.post("/api/list/test/add", async function(req, res) {
+app.post("/api/list/add", async function(req, res) {
   console.log("The session Id is  " + req.body.session.id);
   console.log("The new Item is  " + req.body.newlistItem.Titel);
 
@@ -229,7 +157,12 @@ app.post("/api/list/test/add", async function(req, res) {
 
 });
 
-app.post("/api/list/test/delete", async function(req, res){
+//Delete Request and send back the aktuelle List
+//Du bekommst hier die Session, und die Id des Documentes, welches gelöscht werden soll.
+//Du suchst erst nach dem Document mit der Session_ID, also vom User und dann in diesem Douement
+//unter UserListItems durchsuchst Du das Array nach einem Document (hier ein Object) mit der deleteId.
+//Falls gefunden .remove()
+app.post("/api/list/delete", async function(req, res){
   console.log("The session Id for delete request is  " + req.body.session.id);
   console.log("The delete id is  " + req.body.id);
 
