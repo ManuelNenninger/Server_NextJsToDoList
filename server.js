@@ -31,12 +31,11 @@ app.options('*', cors());
 //For Development use localhost of server
 //For deploy use https://nextjs-to-do-list.vercel.app
 var corsOptions = {
-  origin: 'https://nextjs-to-do-list.vercel.app',
+  origin: 'http://localhost:3000',
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 //Alle Routes sollen bedient werden. Nicht nur eine einzige
-// app.use(cors(corsOptions));
-app.use(cors());
+app.use(cors(corsOptions));
 
 
 
