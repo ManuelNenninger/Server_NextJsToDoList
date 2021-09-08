@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
 //Ohne Cors würde das Object durch die Request entweder Empty ankommen oder die request würde failen.
 const cors = require("cors");
+//Enviroment Variablen wie die, welche in deinem .env sind, funktionieren nicht in Heroku, da .env nicht mit geladen wird.
+//Unter Settings kannst Du diese einzeln hinzufügen.https://devcenter.heroku.com/articles/config-vars
 
 
 
@@ -84,9 +86,6 @@ const UserModel = mongoose.model('UserListCollection', UserList);
 //Gesendet wird das Array mit UserId und dem Array, in welchem die Notes gespeichert sind.
 app.post("/api/list", function(req, res) {
   console.log("the initial request after LogIn was made");
-  console.log("The Mongo URL is: " + DB_URI_ONLINE);
-  console.log("The password is: " + process.env.MONGOOSE_PW);
-  console.log("The database is: " + DB);
   console.log(req.body.id);
   const UserIdFromSession = req.body.id;
 
@@ -186,7 +185,4 @@ app.post("/api/list/delete", async function(req, res){
 
 app.listen(PORT, function(req, res) {
   console.log("Server is running on Port " + (PORT));
-  console.log("The Mongo URL is: " + DB_URI_ONLINE);
-  console.log("The password is: " + process.env.MONGOOSE_PW);
-  console.log("The database is: " + DB);
 });
